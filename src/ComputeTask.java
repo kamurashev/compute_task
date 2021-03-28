@@ -48,9 +48,10 @@ public class ComputeTask {
 
     public static void main(String[] args) {
         ComputeTask computeTask = new ComputeTask();
-        System.out.println(
-                "Processed " + computeTask.getProcessedNumbers() +
-                        " numbers, found " + computeTask.getPrimesCount() +
-                        " prime numbers, completion time " + computeTask.getCompletionTimeMillis() / 1000.0 + " s");
+        System.out.printf(
+                "Processed %d numbers, found %d prime numbers, completion time %f s%n",
+                computeTask.getProcessedNumbers(),
+                computeTask.getPrimesCount(),
+                computeTask.getCompletionTimeMillis() / 1000.0);
     }
 }
