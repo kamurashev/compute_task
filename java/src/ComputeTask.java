@@ -11,10 +11,10 @@ import java.util.List;
  * @Author Kirill Murashev <krill.murashev@gmail.com>
  */
 public class ComputeTask {
+    private static final LocalDateTime START_TIME = LocalDateTime.now();
     private static final int START_NUMBER = 1;
     private static final int END_NUMBER =
             System.getenv("startNumber") == null ? 10000 : Integer.parseInt(System.getenv("startNumber"));
-    private static final LocalDateTime START_TIME = LocalDateTime.now();
 
     private final List<Integer> primes;
     private final long completionTime;
