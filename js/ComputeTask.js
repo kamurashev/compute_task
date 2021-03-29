@@ -2,7 +2,7 @@ const { performance } = require('perf_hooks');
 
 const startTime = performance.now();
 const startNumber = 1;
-const endNumber = process.env.endNumber === undefined ? 10000 : Number(process.env.endNumber);
+const endNumber = Number(process.env.endNumber || 10000);
 
 let primes;
 let completionTime;

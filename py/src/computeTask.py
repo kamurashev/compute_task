@@ -1,31 +1,28 @@
 import time
+import os
 import sys
 
-# Start and end numbers
-start_number = 1
-end_number = 100000
+startTime = time.time()
+startNumber = 1
+endNumber = int(os.getenv('endNumber', 10000))
 
-# Record the test start time
-start = time.time()
 
-# Create variable to store the prime numbers and a counter
-primes = []
-noPrimes = 0
+def find_primes():
+    result = []
+    for number in range(startNumber, endNumber, 1):
+        if is_prime(number):
+            result.append(number)
+    return result
 
-# Loop through each number, then through the factors to identify prime numbers
-for candidate_number in range(start_number, end_number, 1):
-    found_prime = True
-    for div_number in range(2, candidate_number):
-        if candidate_number % div_number == 0:
-            found_prime = False
-            break
-    if found_prime:
-        primes.append(candidate_number)
-        noPrimes += 1
 
-# Once all numbers have been searched, stop the timer
-end = round(time.time() - start, 2)
+def is_prime(number):
+    for div in range(2, number):
+        if number % div == 0:
+            return False
+    return True
 
-# Display the results, uncomment the last to list the prime numbers found
-print(f"Processed {end_number} numbers, found {noPrimes} prime numbers, completion time {end} s")
-# print(primes)
+
+primes = find_primes()
+completionTime = round(time.time() - startTime, 2)
+
+print(f"Processed {endNumber} numbers, found {len(primes)} prime numbers, completion time {completionTime} s")
