@@ -14,3 +14,5 @@ Python - 21-22sec.
 
 gcc - 9.3.0, Java - 16, Node - 15, Python 3.8.5, Ubuntu 20.04
 
+<strong>Inspired by</strong> https://www.youtube.com/watch?v=hGyJTcdfR1E
+
