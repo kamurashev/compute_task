@@ -17,17 +17,12 @@ public class ComputeTask {
     }
 
     private void findPrimes() {
-        primes =
-        IntStream.rangeClosed(START_NUMBER, END_NUMBER)
-                 .boxed()
-                 .filter(this::isPrime)
-                 .toList();
+        primes = IntStream.rangeClosed(START_NUMBER, END_NUMBER).boxed().filter(this::isPrime).toList();
         completionTime = Duration.between(START_TIME, LocalDateTime.now());
     }
 
     private boolean isPrime(int current) {
-        return IntStream.range(2, current)
-                 .noneMatch(div -> current % div == 0);
+        return IntStream.range(2, current).noneMatch(div -> current % div == 0);
     }
 
     public int getProcessedNumbers() {
