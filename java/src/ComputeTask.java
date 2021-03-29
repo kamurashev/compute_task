@@ -1,5 +1,3 @@
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,10 +6,10 @@ import java.util.List;
  * commented out lambda style code is taking approx. 50-100% more time to execute, though it looks nicer,
  * e.g. 1.5...2.1s vs 1.06...1.2s on my Dell latitude 5590 i7 8750u
  * so when you write your code you can choose either performance or younger look huh?)
- * @Author Kirill Murashev <krill.murashev@gmail.com>
+ * @author Kirill Murashev <krill.murashev@gmail.com>
  */
 public class ComputeTask {
-    private static final LocalDateTime START_TIME = LocalDateTime.now();
+    private static final long START_TIME = System.currentTimeMillis();
     private static final int START_NUMBER = 1;
     private static final int END_NUMBER =
             System.getenv("startNumber") == null ? 10000 : Integer.parseInt(System.getenv("startNumber"));
@@ -21,7 +19,7 @@ public class ComputeTask {
 
     public ComputeTask() {
         primes = findPrimes();
-        completionTime = Duration.between(START_TIME, LocalDateTime.now()).toMillis();
+        completionTime = System.currentTimeMillis() - START_TIME;
     }
 
     private List<Integer> findPrimes() {
