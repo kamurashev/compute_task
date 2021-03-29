@@ -36,7 +36,7 @@ void findPrimes()
 {
     for(int number = startNumber; number <= endNumber; number++)
     {
-       if(isPrime(number) == true)
+       if(isPrime(number))
        {
           primes[primesIndex] = number;
           primesIndex++;
