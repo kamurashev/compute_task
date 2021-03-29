@@ -1,4 +1,4 @@
 #! /bin/bash
 
-gcc computeTask.c -o computeTask &&
+gcc -Wall -O3 computeTask.c -o computeTask &&
 ./computeTask

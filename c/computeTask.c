@@ -8,32 +8,50 @@
 
 #include <time.h>
 #include <stdio.h>
+#include <stdbool.h>
+
+#define startNumber 1
+#define endNumber 100000
+
+bool isPrime(int);
+void findPrimes(void);
+
+int primes[endNumber];
+int primesIndex = 0;
 
 int main()
 {
-        clock_t tic = clock();
+    clock_t tic = clock();
 
-        int end_number = 100000;
-        int div_number, candidate_number, count, noPrimes = 0;
+    findPrimes();
 
-        printf("Prime numbers from 1 to %d\n", end_number);
-        for(candidate_number = 1; candidate_number <= end_number; candidate_number++) {
-                count = 0;
-                for (div_number = 2; div_number < candidate_number; div_number++) {
-                        if(candidate_number%div_number == 0) {
-                                count++;
-                                break;
-                        }
-                }
-                if(count == 0 && candidate_number != 1 ) {
-                        //printf(" %d ", candidate_number);
-                        noPrimes++;
-                }
+    clock_t toc = clock();
+    printf("Processed %d numbers, found %d prime numbers, completion time %f s\n",
+    endNumber, primesIndex, (double)(toc - tic) / CLOCKS_PER_SEC);
+
+    return 0;
+}
+
+void findPrimes()
+{
+    for(int number = startNumber; number <= endNumber; number++)
+    {
+       if(isPrime(number) == true)
+       {
+          primes[primesIndex] = number;
+          primesIndex++;
+       }
+    }
+}
+
+bool isPrime(int number)
+{
+    for (int div = 2; div < number; div++)
+    {
+        if(number % div == 0)
+        {
+            return false;
         }
-        printf("Number of primes is %d\n", noPrimes);
-
-        clock_t toc = clock();
-        printf("Time elapsed: %f seconds\n", (double)(toc - tic) / CLOCKS_PER_SEC);
-
-        return 0;
+    }
+    return true;
 }
