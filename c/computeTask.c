@@ -11,7 +11,7 @@
 #include <stdbool.h>
 
 #define startNumber 1
-#define endNumber 100000
+#define endNumber 200000
 
 bool isPrime(int);
 void findPrimes(void);
