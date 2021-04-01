@@ -36,6 +36,8 @@ public class ComputeTask {
                     result.add(number);
                 }
             }
+            System.out.printf("Worker id: %s delivered result of %d, time spent %f s%n",
+                              Thread.currentThread().getId(), result.size(), getExecutionTime());
             return result;
         }
 
@@ -51,9 +53,9 @@ public class ComputeTask {
 
     public static void main(String[] args) {
         ArrayList<CompletableFuture<List<Integer>>> asyncTasks = new ArrayList<>(THREADS);
-        for (int i = 0; i < THREADS; i++) {
-            int endNumber = RANGE * (i + 1);
-            int startFrom = RANGE * i + START_NUMBER;
+        for (int i = 1; i <= THREADS; i++) {
+            int endNumber = i == THREADS ? END_NUMBER : RANGE * i;
+            int startFrom = RANGE * (i - 1) + START_NUMBER;
             asyncTasks.add(CompletableFuture.supplyAsync(new AsyncComputeTask(startFrom, endNumber)));
         }
 
@@ -63,8 +65,10 @@ public class ComputeTask {
         }
 
         System.out.printf("Processed %d numbers, found %d prime numbers, completion time %f s%n",
-                          END_NUMBER,
-                          primes.size(),
-                          (System.currentTimeMillis() - START_TIME) / 1000.0);
+                          END_NUMBER, primes.size(), getExecutionTime());
+    }
+
+    private static Double getExecutionTime() {
+        return  (System.currentTimeMillis() - START_TIME) / 1000.0;
     }
 }
