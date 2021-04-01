@@ -22,7 +22,7 @@ const range = Math.round(endNumber / threads);
 
             const computeWorker = new Worker('./ComputeWorker.js');
             computeWorker.on('message', res => {
-                console.log(`Worker id: ${computeWorker.threadId} delivered result of ${res.length}, time spent ${(performance.now() - startTime) / 1000.0}`);
+                console.log(`Worker id: ${computeWorker.threadId} delivered result of ${res.length}, time spent ${(performance.now() - startTime) / 1000.0} s`);
                 primes = [...primes, ...res];
                 if (++finished === threads) {
                     const completionTime = (performance.now() - startTime) / 1000.0;
