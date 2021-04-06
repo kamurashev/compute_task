@@ -1,5 +1,4 @@
-//I really like functional approach but
-//funny enough commented out code is taking whopping 190 times more time to execute, e.g. on my i7 8750u it takes 250 vs 1.32 s.
+//for thread workers multiprocessing on my i7 8750u it takes 0.5-0.65s for the range of 100 000.
 
 const { performance } = require('perf_hooks');
 const { Worker, isMainThread } = require('worker_threads');
@@ -9,29 +8,40 @@ const startTime = performance.now();
 const threads = os.cpus().length;
 const startNumber = 1;
 const endNumber = Number(process.env.endNumber || 10000);
-const range = Math.round(endNumber / threads);
+
+const workers = [];
+const primes = [];
+
+const finish = () => {
+    const completionTime = (performance.now() - startTime) / 1000.0;
+    console.log(`Processed ${endNumber} numbers, found ${primes.length} prime numbers, completion time ${completionTime} s`);
+
+    workers.forEach(worker => {
+      worker.unref();
+    });
+}
 
 (() => {
-    let primes = [];
-
     if(isMainThread) {
         let finished = 0;
         for (let i = 1; i <= threads; i++) {
-            const startFrom = range * (i - 1) + startNumber;
-            const endAt = i === threads ? endNumber : range * i;
-
-            const computeWorker = new Worker('./ComputeWorker.js');
+            const computeWorker = new Worker('./ComputeWorker.js', { workerData: {endNumber: endNumber, threads: threads} });
+            computeWorker.on('error', (err => console.error(err)));
             computeWorker.on('message', res => {
-                console.log(`Worker id: ${computeWorker.threadId} delivered result of ${res.length}, time spent ${(performance.now() - startTime) / 1000.0} s`);
-                primes = [...primes, ...res];
-                if (++finished === threads) {
-                    const completionTime = (performance.now() - startTime) / 1000.0;
-                    console.log(`Processed ${endNumber} numbers, found ${primes.length} prime numbers, completion time ${completionTime} s`);
+                if(res === 'finish') {
+                    ++finished === threads && finish();
+                    return;
                 }
+                primes.push(res);
             });
-            computeWorker.on('error', (err => console.log(err)));
+            workers.push(computeWorker);
+        }
 
-            computeWorker.postMessage([startFrom, endAt]);
+        for (let i = startNumber, n = 0; i <= endNumber; i++, n++) {
+            workers[n].postMessage(i);
+            if (n === threads - 1) {
+                n = 0;
+            }
         }
     }
 })();
