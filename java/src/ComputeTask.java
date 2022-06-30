@@ -12,7 +12,7 @@ public class ComputeTask {
     private static final long START_TIME = System.currentTimeMillis();
     private static final int START_NUMBER = 1;
     private static final int END_NUMBER =
-            System.getenv("startNumber") == null ? 10000 : Integer.parseInt(System.getenv("startNumber"));
+            System.getenv("endNumber") == null ? 10000 : Integer.parseInt(System.getenv("endNumber"));
 
     private final List<Integer> primes;
     private final long completionTime;

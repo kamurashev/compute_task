@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ComputeTask.js" type="NodeJSConfigurationType" nameIsGenerated="true" path-to-js-file="ComputeTask.js" working-dir="$PROJECT_DIR$/js">
+    <envs>
+      <env name="endNumber" value="100000" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>
