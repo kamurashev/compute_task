@@ -1,3 +1,5 @@
+package compute_task;
+
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 

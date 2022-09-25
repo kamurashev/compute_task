@@ -1,3 +1,6 @@
 /out/
 /compute_task.iml
 /.idea/
+/java/jre-image/
+/java/build/
+/c/computeTask
