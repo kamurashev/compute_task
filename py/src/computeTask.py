@@ -4,7 +4,7 @@ import sys
 
 startTime = time.time()
 startNumber = 1
-endNumber = int(os.getenv('endNumber', 10000))
+endNumber = int(os.getenv('endNumber', 100000))
 
 
 def find_primes():

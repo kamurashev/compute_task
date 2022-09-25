@@ -1,3 +1,5 @@
+package compute_task;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +14,7 @@ public class ComputeTask {
     private static final long START_TIME = System.currentTimeMillis();
     private static final int START_NUMBER = 1;
     private static final int END_NUMBER =
-            System.getenv("endNumber") == null ? 10000 : Integer.parseInt(System.getenv("endNumber"));
+            System.getenv("endNumber") == null ? 100000 : Integer.parseInt(System.getenv("endNumber"));
 
     private final List<Integer> primes;
     private final long completionTime;
