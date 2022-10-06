@@ -22,6 +22,7 @@ Python - 14.050sec. / 2.871sec  all cores (10)
 gcc - clang 13.1.6 (arm64), rustc 1.64.0, Java - 18 (arm64), Node - 18.4, Python 3.9.7 (miniforge3-4.10.3-10), MacOS Monterey 12.4
 
 Inspired by https://www.youtube.com/watch?v=hGyJTcdfR1E
+Thanks https://github.com/sharkdp/hyperfine for great benchmark tool!
 
-
+Usage is straitforward just clone and use build.sh, run.sh, benchmark.sh etc. scriprs in which lang module dir.
 
