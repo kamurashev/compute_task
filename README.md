@@ -16,10 +16,10 @@ gcc - 9.3.0, Rust 1.64.0, Java - Azul 19, Node - 15, Python 3.8.5, Arch Linux - 
 
 For my MacBook Pro 16 2021 M1 Max/64G I got next results for numbers between 1 and 100000:  
 C - 285.5ms single core.  
-Rust - 286.8ms single core. / 59.2ms all cores (10)
-Java - 342.8(JDK runtime) 361.3(JRE image)ms single core / 114.8(JDK runtime) 138(JRE image)ms all cores (10)   
-JS - 531.7ms single core / 188.1ms all cores (10)  
-Python - 14.050sec. / 2.871sec  all cores (10)
+Rust - 286.8ms single core. / 59.2ms all cores (10).  
+Java - 342.8(JDK runtime) 361.3(JRE image)ms single core / 114.8(JDK runtime) 138(JRE image)ms all cores (10).      
+JS - 531.7ms single core / 188.1ms all cores (10).    
+Python - 14.050sec. / 2.871sec  all cores (10).  
 
 gcc - clang 13.1.6 (arm64), rustc 1.64.0, Java - 18 (arm64), Node - 18.4, Python 3.9.7 (miniforge3-4.10.3-10), MacOS Monterey 12.4
 
