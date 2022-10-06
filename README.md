@@ -1,6 +1,8 @@
 # compute_task
 C, Rust, Java, JS, Python naive folded loop based prime numbers calculation written in different languages to compare performance in somewhat real world scenario.
 
+# TL;DR - Rust is awesome ;-).  
+
 It was not designed to be as efficient as possible, and I know there are much more efficient algorithms fot the task. The main point is to write essentially the same processing logic and compare performance depending on language.
 
 For my Dell Latitude 5590 Intel Core i7 8750u laptop I got next results for numbers between 1 and 100000:  
