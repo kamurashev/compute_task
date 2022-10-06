@@ -7,7 +7,7 @@ const os = require('os');
 const startTime = performance.now();
 const threads = os.cpus().length;
 const startNumber = 1;
-const endNumber = Number(process.env.endNumber || 10000);
+const endNumber = Number(process.env.endNumber || 100000);
 
 const workers = [];
 const primes = [];
