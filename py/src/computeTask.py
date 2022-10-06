@@ -4,7 +4,7 @@ import multiprocessing as mp
 
 startTime = time.time()
 startNumber = 1
-endNumber = int(os.getenv('endNumber', 10000))
+endNumber = int(os.getenv('endNumber', 100000))
 processes = int(os.getenv('processes', mp.cpu_count()))
 
 
