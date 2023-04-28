@@ -1,47 +1,45 @@
-/*
-*  Ref: https://www.youtube.com/watch?v=hGyJTcdfR1E&t=53s
-*  @author is @Snowbat Snowbat YouTube member, copy-pasted from https://pastepin.com/fAjwP61f
-*  Version in C with the following mods
-*  - Does not store Primes in an array (Python version does but print statement is commented out). As the size of an array needs to be specified when declaring in C, I dropped this for simplicity. I also commented-out the array code in the Python version to check the performance and the change was not huge (66.54 with array populating vs 54.03 without on this box).
-*  - The Python version incorrectly counts 1 as Prime. The sample C code I found checks for this so I left the check in.
-*/
-
 #include <time.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <omp.h>
 
-#define startNumber 1
-#define endNumber 100000
+int startNumber = 1;
+int endNumber = 100000;
+
+int *primes;
+int primesCount = 0;
 
 bool isPrime(int);
-void findPrimes(void);
-
-int primes[endNumber];
-int primesIndex = 0;
 
 int main()
 {
     clock_t tic = clock();
 
-    findPrimes();
+    primes = malloc(endNumber * sizeof(int));
+    #pragma omp parallel for schedule(dynamic)
+    for (int number = startNumber; number <= endNumber; number++)
+    {
+        if (isPrime(number))
+        {
+            #pragma omp critical
+            {
+                primes[primesCount++] = number;
+            }
+        }
+    }
+
+    for(int i = 0; i < primesCount; i++)
+    {
+        printf("%d ", primes[i]);
+    }
 
     clock_t toc = clock();
     printf("Processed %d numbers, found %d prime numbers, completion time %f s\n",
-    endNumber, primesIndex, (double)(toc - tic) / CLOCKS_PER_SEC);
+    endNumber, primesCount, (double)(toc - tic) / CLOCKS_PER_SEC);
 
+    free(primes);
     return 0;
-}
-
-void findPrimes()
-{
-    for(int number = startNumber; number <= endNumber; number++)
-    {
-       if(isPrime(number))
-       {
-          primes[primesIndex] = number;
-          primesIndex++;
-       }
-    }
 }
 
 bool isPrime(int number)
