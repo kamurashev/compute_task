@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source ./build-module.sh
+
 OUT_DIR='jre-image'
 rm -rf ${OUT_DIR}
 jlink --strip-debug \
