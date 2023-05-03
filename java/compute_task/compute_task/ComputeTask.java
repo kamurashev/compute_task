@@ -1,6 +1,5 @@
 package compute_task;
 
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -18,13 +17,16 @@ public class ComputeTask {
 
     public static void main(String[] args) {
         var primes = IntStream.rangeClosed(START_NUMBER, END_NUMBER).boxed()
-                              .parallel().filter(ComputeTask::isPrime).collect(Collectors.toList());
+                              .parallel().filter(ComputeTask::isPrime).toList();
 
         System.out.printf("Processed %d numbers, found %d prime numbers, completion time %f s%n",
                           END_NUMBER, primes.size(), (System.currentTimeMillis() - START_TIME) / 1000.0);
     }
 
     private static boolean isPrime(int number) {
+        if (number < 2) {
+            return false;
+        }
         for (int div = 2; div < number; div++) {
             if (number % div == 0) {
                 return false;
