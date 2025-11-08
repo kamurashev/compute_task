@@ -39,9 +39,12 @@ pub fn main() !void {
     var results: ArrayList(usize) = try ArrayList(usize).initCapacity(allocator, end_number);
     defer results.deinit(allocator);
 
+    // Use atomic counter for dynamic scheduling
+    var next_number = std.atomic.Value(usize).init(2);
+
     if (mcore) {
-        // Multi-core path with non-blocking threads
-        // Create chunk result arrays
+        // Multi-core path with dynamic work distribution
+        // Create chunk result arrays (one per thread)
         var chunk_results = try allocator.alloc(ArrayList(usize), chunks);
         defer {
             for (chunk_results) |*chunk| {
@@ -50,7 +53,7 @@ pub fn main() !void {
             allocator.free(chunk_results);
         }
 
-        // Initialize each chunk result with pre-allocated capacity
+        // Initialize each chunk result with estimated capacity
         for (chunk_results) |*chunk| {
             chunk.* = try ArrayList(usize).initCapacity(allocator, chunk_size);
         }
@@ -59,10 +62,7 @@ pub fn main() !void {
         defer threads.deinit(allocator);
 
         for (0..chunks) |i| {
-            const start = 2 + i * chunk_size;
-            const end = @min(start + chunk_size, end_number);
-            // std.debug.print("chunk {}: {}..{}\n", .{ i, start, end });
-            const thread = try std.Thread.spawn(.{}, processChunk, .{ start, end, &chunk_results[i] });
+            const thread = try std.Thread.spawn(.{}, process, .{ &next_number, end_number, &chunk_results[i] });
             threads.appendAssumeCapacity(thread);
         }
 
@@ -77,15 +77,21 @@ pub fn main() !void {
         }
     } else {
         // Single-core path
-        // std.debug.print("chunk 0: 2..{}\n", .{end_number});
-        processChunk(2, end_number, &results);
+        process(&next_number, end_number, &results);
     }
 
     print("Processed {} numbers, found {} prime numbers\n", .{ end_number, results.items.len });
 }
 
-fn processChunk(start: usize, end: usize, chunk_result: *ArrayList(usize)) void {
-    for (start..end) |number| {
+fn process(next_number: *std.atomic.Value(usize), end_number: usize, chunk_result: *ArrayList(usize)) void {
+    while (true) {
+        // Atomically get the next number to check
+        const number = next_number.fetchAdd(1, .monotonic);
+
+        if (number >= end_number) {
+            break;
+        }
+
         if (isPrime(number)) {
             chunk_result.appendAssumeCapacity(number);
         }
