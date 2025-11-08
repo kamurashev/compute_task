@@ -8,6 +8,7 @@
 
 echo "removing previous executable..."
 rm computeTask
+echo "building C executable..."
 #gcc -I/opt/homebrew/opt/libomp/include -Wall -O3 computeTask.c -fopenmp -o computeTask
 #clang -Wall -O3 computeTask.c -fopenmp -o computeTask
 clang -Wall -O3 computeTask.c -Xpreprocessor -fopenmp -lomp \

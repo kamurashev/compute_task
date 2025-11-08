@@ -2,7 +2,8 @@
 
 source ./build.sh
 
-echo && echo "One core:"
+echo && echo "C"
+echo "One core:"
 hyperfine -w 8 -r 25 ./computeTask
 
 echo "All cores:"
