@@ -6,3 +6,7 @@
 /c/computeTask
 /rust/compute-task/target/
 /go/compute_task/compute_task
+/zig/.zig-cache
+/.zig-cache/z/
+/.zig-cache/h/
+/.zig-cache/o/
