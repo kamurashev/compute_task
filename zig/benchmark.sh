@@ -1,3 +1,4 @@
 #! /bin/bash
 
-hyperfine -r 100 ./zig-out/bin/zig
+#mcore=true hyperfine -w 10 -r 100 ./zig-out/bin/zig
+hyperfine -w 10 -r 100 ./zig-out/bin/zig
