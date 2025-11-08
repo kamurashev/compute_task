@@ -9,6 +9,10 @@
 echo "removing previous executable..."
 rm computeTask
 #gcc -I/opt/homebrew/opt/libomp/include -Wall -O3 computeTask.c -fopenmp -o computeTask
-/opt/homebrew/opt/llvm/bin/clang -Wall -O3 computeTask.c -fopenmp -o computeTask
+#clang -Wall -O3 computeTask.c -fopenmp -o computeTask
+clang -Wall -O3 computeTask.c -Xpreprocessor -fopenmp -lomp \
+  -I/opt/homebrew/opt/libomp/include \
+  -L/opt/homebrew/opt/libomp/lib \
+  -o computeTask
 echo "built as ./computeTask"
 echo "Done, happy hacking!"

@@ -2,4 +2,8 @@
 
 source ./build.sh
 
-hyperfine -r 100 ./computeTask
+echo && echo "One core:"
+hyperfine -w 8 -r 25 ./computeTask
+
+echo "All cores:"
+mcore=true hyperfine -w 10 -r 75 ./computeTask
