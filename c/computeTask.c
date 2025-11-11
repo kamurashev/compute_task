@@ -10,7 +10,7 @@ void getPrimesMultiCore(int, int, int*, int*);
 
 int main()
 {
-    int start_number = 2;
+    int start_number = 1;
     int end_number = 100000;
 
     // Read endnum environment variable
@@ -82,6 +82,10 @@ void getPrimesMultiCore(int start_number, int end_number, int *primes, int *prim
 
 bool isPrime(int number)
 {
+    if (number == 1)
+    {
+        return false;
+    }
     for (int div = 2; div < number; div++)
     {
         if (number % div == 0)

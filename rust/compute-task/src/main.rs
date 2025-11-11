@@ -82,6 +82,9 @@ fn get_primes_multi_core(start_num: usize, end_num: usize) -> Vec<usize> {
 }
 
 fn is_prime(num: usize) -> bool {
+    if num == 1 {
+        return false;
+    }
     for div in 2..num {
         if num % div == 0 {
             return false;

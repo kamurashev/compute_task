@@ -104,6 +104,9 @@ public class ComputeTask {
     }
 
     private boolean isPrime(int number) {
+        if (number == 1) {
+            return false;
+        }
         for (int div = 2; div < number; div++) {
             if(number % div == 0) {
                 return false;

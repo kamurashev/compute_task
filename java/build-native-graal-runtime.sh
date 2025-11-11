@@ -7,8 +7,9 @@ source "$HOME/.sdkman/bin/sdkman-init.sh"
 SDK_GRAAL_VM_VERSION_ID=25.0.1-graal
 sdk install java "$SDK_GRAAL_VM_VERSION_ID"
 sdk use java "$SDK_GRAAL_VM_VERSION_ID"
-#install GraalVM native-image utility
-gu install native-image
+
+##install GraalVM native-image utility seem to be not needed anymore
+#gu install native-image
 
 #build
 rm -rf ./graalvm-build ./native-image

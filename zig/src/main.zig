@@ -51,7 +51,7 @@ fn getPrimesSingleCore(start_number: usize, end_number: usize, results: *ArrayLi
 
 fn getPrimesMultiCore(allocator: Allocator, start_number: usize, end_number: usize, results: *ArrayList(usize)) !void {
     const num_threads = std.Thread.getCpuCount() catch 1;
-    const chunk_size = (end_number - start_number + num_threads - 1) / num_threads;
+    const chunk_size = (end_number - start_number) / num_threads;
 
     var next_number = std.atomic.Value(usize).init(start_number);
 
@@ -95,6 +95,7 @@ fn process(next_number: *std.atomic.Value(usize), end_number: usize, chunk_resul
 }
 
 fn isPrime(number: usize) bool {
+    if (number == 1) return false;
     for (2..number) |div| {
         if (number % div == 0) {
             return false;
