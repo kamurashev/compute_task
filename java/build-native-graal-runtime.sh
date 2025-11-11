@@ -4,7 +4,7 @@
 source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 #install and apply GraalVM to current session
-SDK_GRAAL_VM_VERSION_ID=22.3.r19-grl
+SDK_GRAAL_VM_VERSION_ID=25.0.1-graal
 sdk install java "$SDK_GRAAL_VM_VERSION_ID"
 sdk use java "$SDK_GRAAL_VM_VERSION_ID"
 #install GraalVM native-image utility

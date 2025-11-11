@@ -2,32 +2,100 @@ package compute_task;
 
 import java.util.ArrayList;
 import java.util.List;
+//import java.util.concurrent.Callable;
+//import java.util.concurrent.ExecutionException;
+//import java.util.concurrent.ExecutorService;
+//import java.util.concurrent.Executors;
+//import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
+//import java.util.stream.Collectors;
+//import java.util.stream.IntStream;
 
-
-/**
- * commented out lambda style code is taking approx. 50-100% more time to execute, though it looks nicer,
- * e.g. 1.5...2.1s vs 1.06...1.2s on my Dell latitude 5590 i7 8750u
- * so when you write your code you can choose either performance or younger look huh?)
- * @author Kirill Murashev <krill.murashev@gmail.com>
- */
 public class ComputeTask {
-    private static final long START_TIME = System.currentTimeMillis();
     private static final int START_NUMBER = 1;
     private static final int END_NUMBER =
-            System.getenv("endNumber") == null ? 100000 : Integer.parseInt(System.getenv("endNumber"));
+            System.getenv("endnum") == null ? 100000 : Integer.parseInt(System.getenv("endnum"));
+    private static final boolean M_CORE =
+            System.getenv("mcore") != null && Boolean.parseBoolean(System.getenv("mcore"));
 
-    private final List<Integer> primes;
-    private final long completionTime;
+    private List<Integer> findPrimesMultiCore() throws InterruptedException {
+        int cores = Runtime.getRuntime().availableProcessors();
+        AtomicInteger nextNumber = new AtomicInteger(START_NUMBER);
+        List<List<Integer>> chunkResults = new ArrayList<>(cores);
+        List<Thread> threads = new ArrayList<>(cores);
 
-    public ComputeTask() {
-        primes = findPrimes();
-        completionTime = System.currentTimeMillis() - START_TIME;
+        for (int i = 0; i < cores; i++) {
+            List<Integer> localResult = new ArrayList<>(END_NUMBER - START_NUMBER);
+            chunkResults.add(localResult);
+            Thread thread = new Thread(() -> {
+                while (true) {
+                    int number = nextNumber.getAndIncrement();
+                    if (number >= END_NUMBER) {
+                        break;
+                    } 
+                    if (isPrime(number)) {
+                        localResult.add(number);
+                    }
+                }
+            });
+            threads.add(thread);
+            thread.start();
+        }
+
+        for (Thread thread : threads) {
+            thread.join();
+        }
+
+        List<Integer> result = new ArrayList<>(END_NUMBER - START_NUMBER);
+        for (List<Integer> chunk : chunkResults) {
+            result.addAll(chunk);
+        }
+        return result;
     }
 
-    private List<Integer> findPrimes() {
-        final List<Integer> result = new ArrayList<>(END_NUMBER);
-//        result = IntStream.rangeClosed(START_NUMBER, END_NUMBER).boxed().filter(this::isPrime).toList();
-        for (int number = START_NUMBER; number <= END_NUMBER; number++) {
+//    private List<Integer> findPrimesMultiCoreParallelStream() {
+//        return IntStream.range(START_NUMBER, END_NUMBER)
+//                .parallel()
+//                .filter(this::isPrime)
+//                .boxed()
+//                .collect(Collectors.toList());
+//    }
+//
+//    private List<Integer> findPrimesWithThreadPoolDynamic() throws InterruptedException, ExecutionException {
+//        int cores = Runtime.getRuntime().availableProcessors();
+//        ExecutorService executor = Executors.newFixedThreadPool(cores);
+//        AtomicInteger nextNumber = new AtomicInteger(START_NUMBER);
+//        List<Callable<List<Integer>>> tasks = new ArrayList<>(cores);
+//
+//        for (int i = 0; i < cores; i++) {
+//            tasks.add(() -> {
+//                List<Integer> primes = new ArrayList<>(END_NUMBER - START_NUMBER);
+//                while (true) {
+//                    int number = nextNumber.getAndIncrement();
+//                    if (number >= END_NUMBER) {
+//                        break;
+//                    }
+//                    if (isPrime(number)) {
+//                        primes.add(number);
+//                    }
+//                }
+//                return primes;
+//            });
+//        }
+//
+//        List<Future<List<Integer>>> futures = executor.invokeAll(tasks);
+//        List<Integer> result = new ArrayList<>(END_NUMBER - START_NUMBER);
+//        for (Future<List<Integer>> future : futures) {
+//            result.addAll(future.get());
+//        }
+//
+//        executor.shutdown();
+//        return result;
+//    }
+
+    private List<Integer> findPrimesSingleCore() {
+        List<Integer> result = new ArrayList<>(END_NUMBER - START_NUMBER);
+        for (int number = START_NUMBER; number < END_NUMBER; number++) {
             if (isPrime(number)) {
                 result.add(number);
             }
@@ -36,7 +104,6 @@ public class ComputeTask {
     }
 
     private boolean isPrime(int number) {
-//        return IntStream.range(2, number).noneMatch(div -> number % div == 0);
         for (int div = 2; div < number; div++) {
             if(number % div == 0) {
                 return false;
@@ -45,28 +112,11 @@ public class ComputeTask {
         return true;
     }
 
-    public int getProcessedNumbers() {
-        return END_NUMBER;
-    }
-
-    public List<Integer> getPrimes() {
-        return primes;
-    }
-
-    public int getPrimesCount() {
-        return primes.size();
-    }
-
-    public long getCompletionTimeMillis() {
-        return completionTime;
-    }
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         ComputeTask computeTask = new ComputeTask();
-        System.out.printf(
-                "Processed %d numbers, found %d prime numbers, completion time %f s%n",
-                computeTask.getProcessedNumbers(),
-                computeTask.getPrimesCount(),
-                computeTask.getCompletionTimeMillis() / 1000.0);
+//        List<Integer> primes = M_CORE ? computeTask.findPrimesWithThreadPoolDynamic() : computeTask.findPrimesSingleCore();
+//        List<Integer> primes = M_CORE ? computeTask.findPrimesMultiCoreParallelStream() : computeTask.findPrimesSingleCore();
+         List<Integer> primes = M_CORE ? computeTask.findPrimesMultiCore() : computeTask.findPrimesSingleCore();
+        System.out.printf("Processed %d numbers, found %d prime numbers", END_NUMBER - START_NUMBER, primes.size());
     }
 }
