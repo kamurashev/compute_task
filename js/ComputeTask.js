@@ -1,26 +1,66 @@
-//I really like functional approach but
-//funny enough commented out code is taking whopping 190 times more time to execute, e.g. on my i7 8750u it takes 250 vs 1.32 s.
+const { Worker, isMainThread, parentPort, workerData } = require('worker_threads');
+const os = require('os');
 
-const { performance } = require('perf_hooks');
+const startNumber = 2;
+const endNumber = Number(process.env.endnum || 100000);
+const mCore = process.env.mcore === 'true';
 
-const startTime = performance.now();
-const startNumber = 1;
-const endNumber = Number(process.env.endNumber || 100000);
+if (isMainThread) {
+    (async () => {
+        const primes = mCore ? await findPrimesMultiCore() : findPrimesSingleCore();
+        console.log(`Processed ${endNumber} numbers, found ${primes.length} prime numbers`);
+    })();
+} else {
+    const { sharedBuffer, endNumber } = workerData;
+    const nextNumber = new Int32Array(sharedBuffer);
+    const primes = [];
 
-let primes;
-let completionTime;
-
-const findPrimes = () => {
-    const result = [];
-    // result = [...Array(endNumber).keys()].slice(startNumber).filter(number => isPrime(number));
-    for (let number = startNumber; number <= endNumber; number++) {
-        isPrime(number) && (result.push(number));
+    while (true) {
+        const number = Atomics.add(nextNumber, 0, 1);
+        if (number >= endNumber) {
+            break;
+        }
+        if (isPrime(number)) {
+            primes.push(number);
+        }
     }
-    return result;
+    parentPort.postMessage(primes);
 }
 
-const isPrime = (number) => {
+function findPrimesSingleCore() {
+    const primes = [];
+    // const primes = [...Array(endNumber).keys()].slice(startNumber).filter(number => isPrime(number));
+    for (let number = startNumber; number < endNumber; number++) {
+        if (isPrime(number)) {
+            primes.push(number);
+        }
+    }
+    return primes;
+}
+
+async function findPrimesMultiCore() {
+    const numCores = os.cpus().length;
+    const sharedBuffer = new SharedArrayBuffer(4);
+    const nextNumber = new Int32Array(sharedBuffer);
+    nextNumber[0] = startNumber;
+
+    const results = await Promise.all(
+        Array.from({ length: numCores }, () =>
+            new Promise((resolve, reject) => {
+                const worker = new Worker(__filename, {
+                    workerData: { sharedBuffer, endNumber }
+                });
+                worker.on('message', resolve);
+                worker.on('error', reject);
+            })
+        )
+    );
+    return results.flat();
+}
+
+function isPrime(number) {
     // return ![...Array(number - 1).keys()].slice(2).some(div => number % div === 0);
+    if (number === 1) return false;
     for (let div = 2; div < number; div++) {
         if(number % div === 0) {
             return false;
@@ -28,9 +68,3 @@ const isPrime = (number) => {
     }
     return true;
 }
-
-(() => {
-    primes = findPrimes();
-    completionTime = (performance.now() - startTime) / 1000.0;
-    console.log(`Processed ${endNumber} numbers, found ${primes.length} prime numbers, completion time ${completionTime} s`);
-})();
