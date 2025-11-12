@@ -24,15 +24,17 @@ C - 288.8ms single core. / 40.4 all cores (10) - omp.h for multithreading
 Java GraalVM - 310.1ms single core / 44.9ms all cores (10)   
 V - 289.3ms single core. / 53.9ms all cores (10)  
 GO - 400ms single core / 53.6ms all cores (10)  
-Java JDK runtime - 341.1ms single core / 94.3ms all cores (10)   
-Java JRE Image - 377ms single core / 123.9ms all cores (10)  
-JS - 597ms single core / 128.1ms all cores (10)  
+JS (Bun) - 311.9ms single core / 87.4ms all cores (10)
+Java JDK runtime - 341.1ms single core / 94.3ms all cores (10)
+Java JRE Image - 377ms single core / 123.9ms all cores (10)
+JS (Node) - 596.1ms single core / 126.7ms all cores (10)
+JS (Deno) - 630.8ms single core / 188.2ms all cores (10)
 PyPy3.11-7.3.19 - 792.8ms / 342ms  all cores (10)
 Python3.15-dev - 9.651sec. / 2.018sec  all cores (10)  
 Python3.13.3 - 14.050sec. / 2.871sec  all cores (10)  
 
 clang version 20.1.8, rustc 1.91.0, Java - 25.0.1-oracle/25.0.1-graal, GO - go1.25.4,
-Node - 24.11.0, Python 3.13.3/3.15-dev/PyPy3.11-7.3.19, MacOS 15.6 
+Bun - 1.3.2, Node - 24.11.0, Deno - 2.5.6, Python 3.13.3/3.15-dev/PyPy3.11-7.3.19, MacOS 15.6 
 
 Inspired by https://www.youtube.com/watch?v=hGyJTcdfR1E
 Thanks https://github.com/sharkdp/hyperfine for great benchmark tool!
