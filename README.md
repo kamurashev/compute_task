@@ -12,12 +12,14 @@ Zig - 942.6ms single core. / 179.6ms all cores (4)
 Rust - 942.2ms single core / 182.0ms all cores (4)  
 C - 941.6ms. single core, 185.9ms all cores (4) - omp.h for multithreading  
 Java GraalVM - 1055ms single core / 192ms all cores (4)  
+V - 949.1ms single core. / 223.8ms all cores (10)  
 Java JDK runtime - 998ms single core / 285ms all cores (4)  
 Java JRE Image - 1032ms single core / 316ms all cores (4)  
+GO - 3476ms single core / 669ms all cores (4)  
 JS - 1.3...1.4sec. single core / 0.5...0.65 all cores (4)  
 Python - 21...22sec. / 7...8.5 all cores (4)  
 
-clang 21.1.5, zig 0.15.2, rustc 1.91.0, Java - 25.0.1-oracle/25.0.1-graal, GO - go1.25.4,
+clang 21.1.5, zig 0.15.2, rustc 1.91.0, v 0.4.12, Java 25.0.1-oracle/25.0.1-graal, GO - go1.25.4,
 Bun - 1.3.2, Node - 24.11.0, Deno - 2.5.6, Python 3.13.3/3.15-dev/PyPy3.11-7.3.19, Arch Linux 6.13.1-arch1-1  
 
 For my MacBook Pro 16 2021 M1 Max/64G I got next results for numbers between 1 and 100000:  
@@ -36,7 +38,7 @@ PyPy3.11-7.3.19 - 792.8ms / 342ms  all cores (10)
 Python3.15-dev - 9.651sec. / 2.018sec  all cores (10)  
 Python3.13.3 - 14.050sec. / 2.871sec  all cores (10)  
 
-clang 20.1.8, zig 0.15.2, rustc 1.91.0, Java - 25.0.1-oracle/25.0.1-graal, GO - go1.25.4,
+clang 20.1.8, zig 0.15.2, rustc 1.91.0, v 0.4.12, Java 25.0.1-oracle/25.0.1-graal, GO - go1.25.4,
 Bun - 1.3.2, Node - 24.11.0, Deno - 2.5.6, Python 3.13.3/3.15-dev/PyPy3.11-7.3.19, MacOS 15.6 
 
 Inspired by https://www.youtube.com/watch?v=hGyJTcdfR1E

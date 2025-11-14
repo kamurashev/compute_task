@@ -3,6 +3,8 @@
 # Source asdf if available
 if [ -f "$HOME/.asdf/asdf.sh" ]; then
     . "$HOME/.asdf/asdf.sh"
+elif [ -f "/opt/asdf-vm/asdf.sh" ]; then
+    . "/opt/asdf-vm/asdf.sh"
 elif command -v brew &> /dev/null && [ -f "$(brew --prefix asdf)/libexec/asdf.sh" ]; then
     . "$(brew --prefix asdf)/libexec/asdf.sh"
 fi
@@ -104,8 +106,9 @@ if ! command -v asdf &> /dev/null; then
 
         pacman)
             # Install asdf via AUR or git
-            if command -v yay &> /dev/null; then
+            if command -v yay &> /dev/null && yay --version &> /dev/null; then
                 yay -S --noconfirm asdf-vm
+                ASDF_SCRIPT="/opt/asdf-vm/asdf.sh"
             else
                 # Install dependencies
                 sudo pacman -Sy --noconfirm curl git
@@ -114,6 +117,7 @@ if ! command -v asdf &> /dev/null; then
                 if [ ! -d "$HOME/.asdf" ]; then
                     git clone https://github.com/asdf-vm/asdf.git "$HOME/.asdf" --branch v0.14.0
                 fi
+                ASDF_SCRIPT="$HOME/.asdf/asdf.sh"
             fi
 
             # Add to shell config
@@ -126,12 +130,18 @@ if ! command -v asdf &> /dev/null; then
 
             if [ -n "$SHELL_CONFIG" ] && ! grep -q "asdf.sh" "$SHELL_CONFIG"; then
                 echo '' >> "$SHELL_CONFIG"
-                echo '. "$HOME/.asdf/asdf.sh"' >> "$SHELL_CONFIG"
+                if [ "$ASDF_SCRIPT" = "/opt/asdf-vm/asdf.sh" ]; then
+                    echo '. /opt/asdf-vm/asdf.sh' >> "$SHELL_CONFIG"
+                else
+                    echo '. "$HOME/.asdf/asdf.sh"' >> "$SHELL_CONFIG"
+                fi
                 echo "Added asdf to $SHELL_CONFIG"
             fi
 
             # Source asdf for current session
-            . "$HOME/.asdf/asdf.sh"
+            if [ -f "$ASDF_SCRIPT" ]; then
+                . "$ASDF_SCRIPT"
+            fi
             ;;
     esac
 
@@ -142,6 +152,8 @@ else
     if ! command -v asdf &> /dev/null; then
         if [ -f "$HOME/.asdf/asdf.sh" ]; then
             . "$HOME/.asdf/asdf.sh"
+        elif [ -f "/opt/asdf-vm/asdf.sh" ]; then
+            . "/opt/asdf-vm/asdf.sh"
         elif command -v brew &> /dev/null && [ -f "$(brew --prefix asdf)/libexec/asdf.sh" ]; then
             . "$(brew --prefix asdf)/libexec/asdf.sh"
         fi
