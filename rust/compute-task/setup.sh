@@ -5,11 +5,6 @@ if [ -f "$HOME/.cargo/env" ]; then
     source "$HOME/.cargo/env"
 fi
 
-# If all dependencies are available, just return
-if command -v cargo &> /dev/null && command -v rustc &> /dev/null && command -v hyperfine &> /dev/null; then
-    return 0 2>/dev/null || exit 0
-fi
-
 set -e
 
 echo "Setting up Rust development environment..."
@@ -70,13 +65,31 @@ if ! command -v cargo &> /dev/null || ! command -v rustc &> /dev/null; then
     echo "Rust installed successfully"
 else
     echo "Rust is already installed"
+
+    # Update Rust to latest version
+    if command -v rustup &> /dev/null; then
+        echo "Updating Rust to latest version..."
+        rustup update stable
+        rustup default stable
+    fi
 fi
 
-# Install hyperfine if not present
+# Install or update hyperfine
 if ! command -v hyperfine &> /dev/null; then
     install_package "hyperfine"
 else
-    echo "hyperfine is already installed"
+    echo "hyperfine is already installed. Checking for updates..."
+    case $PKG_MGR in
+        brew)
+            brew upgrade hyperfine 2>/dev/null || echo "hyperfine is already at latest version"
+            ;;
+        apt)
+            sudo apt update && sudo apt install --only-upgrade -y hyperfine 2>/dev/null || echo "hyperfine is already at latest version"
+            ;;
+        pacman)
+            sudo pacman -S --noconfirm hyperfine
+            ;;
+    esac
 fi
 
 echo ""

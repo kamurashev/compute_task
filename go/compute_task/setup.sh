@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-# If all dependencies are available, just return
-if command -v go &> /dev/null && command -v hyperfine &> /dev/null; then
-    return 0 2>/dev/null || exit 0
-fi
-
 set -e
 
 echo "Setting up Go development environment..."
@@ -41,8 +36,9 @@ install_package() {
     esac
 }
 
-# Install Go if not present
+# Install or update Go
 if ! command -v go &> /dev/null; then
+    echo "Go not found. Installing..."
     case $PKG_MGR in
         brew)
             install_package "go"
@@ -55,14 +51,36 @@ if ! command -v go &> /dev/null; then
             ;;
     esac
 else
-    echo "Go is already installed"
+    echo "Go is already installed. Updating to latest version..."
+    case $PKG_MGR in
+        brew)
+            brew upgrade go 2>/dev/null || echo "Go is already at latest version"
+            ;;
+        apt)
+            sudo apt update && sudo apt install --only-upgrade -y golang 2>/dev/null || echo "Go is already at latest version"
+            ;;
+        pacman)
+            sudo pacman -S --noconfirm go
+            ;;
+    esac
 fi
 
-# Install hyperfine if not present
+# Install or update hyperfine
 if ! command -v hyperfine &> /dev/null; then
     install_package "hyperfine"
 else
-    echo "hyperfine is already installed"
+    echo "hyperfine is already installed. Checking for updates..."
+    case $PKG_MGR in
+        brew)
+            brew upgrade hyperfine 2>/dev/null || echo "hyperfine is already at latest version"
+            ;;
+        apt)
+            sudo apt update && sudo apt install --only-upgrade -y hyperfine 2>/dev/null || echo "hyperfine is already at latest version"
+            ;;
+        pacman)
+            sudo pacman -S --noconfirm hyperfine
+            ;;
+    esac
 fi
 
 echo ""

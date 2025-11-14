@@ -7,16 +7,6 @@ if [ -f "$HOME/.pyenv/bin/pyenv" ]; then
     eval "$(pyenv init -)"
 fi
 
-# If all dependencies are available, just return
-if command -v pyenv &> /dev/null && command -v hyperfine &> /dev/null; then
-    # Check if required Python versions are installed
-    if pyenv versions --bare | grep -q "3.13.3" && \
-       pyenv versions --bare | grep -q "3.15-dev" && \
-       pyenv versions --bare | grep -q "pypy3.11-7.3.19"; then
-        return 0 2>/dev/null || exit 0
-    fi
-fi
-
 set -e
 
 echo "Setting up Python development environment..."
@@ -120,8 +110,24 @@ install_python_version() {
         pyenv install "${version}"
     else
         echo "Python ${version} is already installed"
+        # For dev versions, update to latest
+        if [[ "$version" == *"-dev" ]]; then
+            echo "Updating ${version} to latest development version..."
+            pyenv uninstall -f "${version}"
+            pyenv install "${version}"
+        fi
     fi
 }
+
+# Update pyenv
+if command -v pyenv &> /dev/null; then
+    echo "Updating pyenv..."
+    if [ -d "$HOME/.pyenv/.git" ]; then
+        cd "$HOME/.pyenv" && git pull
+    elif [ "$PKG_MGR" = "brew" ]; then
+        brew upgrade pyenv 2>/dev/null || echo "pyenv is already at latest version"
+    fi
+fi
 
 # Install Python versions
 install_python_version "3.13.3"
@@ -131,11 +137,22 @@ install_python_version "pypy3.11-7.3.19"
 # Set local Python versions for this directory
 pyenv local 3.13.3 3.15-dev pypy3.11-7.3.19
 
-# Install hyperfine if not present
+# Install or update hyperfine
 if ! command -v hyperfine &> /dev/null; then
     install_package "hyperfine"
 else
-    echo "hyperfine is already installed"
+    echo "hyperfine is already installed. Checking for updates..."
+    case $PKG_MGR in
+        brew)
+            brew upgrade hyperfine 2>/dev/null || echo "hyperfine is already at latest version"
+            ;;
+        apt)
+            sudo apt update && sudo apt install --only-upgrade -y hyperfine 2>/dev/null || echo "hyperfine is already at latest version"
+            ;;
+        pacman)
+            sudo pacman -S --noconfirm hyperfine
+            ;;
+    esac
 fi
 
 echo ""

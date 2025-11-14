@@ -5,11 +5,6 @@ if [ -f "$HOME/.sdkman/bin/sdkman-init.sh" ]; then
     source "$HOME/.sdkman/bin/sdkman-init.sh"
 fi
 
-# If all dependencies are available, just return
-if command -v java &> /dev/null && command -v hyperfine &> /dev/null; then
-    return 0 2>/dev/null || exit 0
-fi
-
 set -e
 
 echo "Setting up Java development environment..."
@@ -83,10 +78,23 @@ else
 fi
 
 # Update SDKMAN
+echo "Updating SDKMAN..."
+sdk selfupdate force
 sdk update
 
 # Install Java (default to Oracle Java 25.0.1, same as set-java-version.sh)
 SDK_JAVA_VERSION_ID=${1:-25.0.1-oracle}
+
+# Check if a newer version is available if no specific version requested
+if [ $# -eq 0 ]; then
+    echo "Checking for latest Java version..."
+    LATEST_JAVA=$(sdk list java | grep -o '[0-9][0-9]*\.[0-9]*\.[0-9]*-oracle' | head -1)
+    if [ -n "$LATEST_JAVA" ]; then
+        SDK_JAVA_VERSION_ID="$LATEST_JAVA"
+        echo "Using latest Java version: ${SDK_JAVA_VERSION_ID}"
+    fi
+fi
+
 if ! sdk list java | grep -q "installed.*${SDK_JAVA_VERSION_ID}"; then
     echo "Installing Java ${SDK_JAVA_VERSION_ID}..."
     sdk install java "${SDK_JAVA_VERSION_ID}"
@@ -96,12 +104,24 @@ fi
 
 # Set Java version
 sdk use java "${SDK_JAVA_VERSION_ID}"
+sdk default java "${SDK_JAVA_VERSION_ID}"
 
-# Install hyperfine if not present
+# Install or update hyperfine
 if ! command -v hyperfine &> /dev/null; then
     install_package "hyperfine"
 else
-    echo "hyperfine is already installed"
+    echo "hyperfine is already installed. Checking for updates..."
+    case $PKG_MGR in
+        brew)
+            brew upgrade hyperfine 2>/dev/null || echo "hyperfine is already at latest version"
+            ;;
+        apt)
+            sudo apt update && sudo apt install --only-upgrade -y hyperfine 2>/dev/null || echo "hyperfine is already at latest version"
+            ;;
+        pacman)
+            sudo pacman -S --noconfirm hyperfine
+            ;;
+    esac
 fi
 
 echo ""

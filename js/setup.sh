@@ -7,11 +7,6 @@ elif command -v brew &> /dev/null && [ -f "$(brew --prefix asdf)/libexec/asdf.sh
     . "$(brew --prefix asdf)/libexec/asdf.sh"
 fi
 
-# If all runtimes are available, just return
-if command -v node &> /dev/null && command -v bun &> /dev/null && command -v deno &> /dev/null && command -v hyperfine &> /dev/null; then
-    return 0 2>/dev/null || exit 0
-fi
-
 set -e
 
 echo "Setting up JavaScript development environment..."
@@ -177,20 +172,35 @@ install_runtime() {
     asdf reshim "${runtime}"
 }
 
-# Install Node.js
+# Update asdf plugins
+echo "Updating asdf plugins..."
+asdf plugin update --all
+
+# Install/Update Node.js
 install_runtime "nodejs" "latest"
 
-# Install Bun
+# Install/Update Bun
 install_runtime "bun" "latest"
 
-# Install Deno
+# Install/Update Deno
 install_runtime "deno" "latest"
 
-# Install hyperfine if not present
+# Install or update hyperfine
 if ! command -v hyperfine &> /dev/null; then
     install_package "hyperfine"
 else
-    echo "hyperfine is already installed"
+    echo "hyperfine is already installed. Checking for updates..."
+    case $PKG_MGR in
+        brew)
+            brew upgrade hyperfine 2>/dev/null || echo "hyperfine is already at latest version"
+            ;;
+        apt)
+            sudo apt update && sudo apt install --only-upgrade -y hyperfine 2>/dev/null || echo "hyperfine is already at latest version"
+            ;;
+        pacman)
+            sudo pacman -S --noconfirm hyperfine
+            ;;
+    esac
 fi
 
 echo ""

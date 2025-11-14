@@ -8,14 +8,17 @@ The main point is to write essentially the same processing logic
 and compare performance depending on language.
 
 For my Dell Latitude 5590 Intel Core i7 8750u laptop I got next results for numbers between 1 and 100000:  
-C - 936.5ms. single core, 175.7ms all cores (4) - omp.h for multithreading  
-Rust - 937.2ms single core / 267.5ms all cores (4)  
-Java - 991.6(JDK Runtime) 1008(JRE Img)ms single core / 352.2(JDK Runtime) 356.5(JRE Img)ms all cores (4)  
+Zig - 942.6ms single core. / 179.6ms all cores (4)  
+Rust - 942.2ms single core / 182.0ms all cores (4)  
+C - 941.6ms. single core, 185.9ms all cores (4) - omp.h for multithreading  
+Java GraalVM - 1055ms single core / 192ms all cores (4)  
+Java JDK runtime - 998ms single core / 285ms all cores (4)  
+Java JRE Image - 1032ms single core / 316ms all cores (4)  
 JS - 1.3...1.4sec. single core / 0.5...0.65 all cores (4)  
 Python - 21...22sec. / 7...8.5 all cores (4)  
 
-gcc - 12.2.1 20230201, Rust 1.69.0, Java - Azul 19, GO - go1.19.1,
-Node - 15, Python 3.8.5, Arch Linux - Linux 5.19.6-arch1-1  
+clang 21.1.5, zig 0.15.2, rustc 1.91.0, Java - 25.0.1-oracle/25.0.1-graal, GO - go1.25.4,
+Bun - 1.3.2, Node - 24.11.0, Deno - 2.5.6, Python 3.13.3/3.15-dev/PyPy3.11-7.3.19, Arch Linux 6.13.1-arch1-1  
 
 For my MacBook Pro 16 2021 M1 Max/64G I got next results for numbers between 1 and 100000:  
 Zig - 288.8ms single core. / 39.0ms all cores (10)  
@@ -33,7 +36,7 @@ PyPy3.11-7.3.19 - 792.8ms / 342ms  all cores (10)
 Python3.15-dev - 9.651sec. / 2.018sec  all cores (10)  
 Python3.13.3 - 14.050sec. / 2.871sec  all cores (10)  
 
-clang version 20.1.8, rustc 1.91.0, Java - 25.0.1-oracle/25.0.1-graal, GO - go1.25.4,
+clang 20.1.8, zig 0.15.2, rustc 1.91.0, Java - 25.0.1-oracle/25.0.1-graal, GO - go1.25.4,
 Bun - 1.3.2, Node - 24.11.0, Deno - 2.5.6, Python 3.13.3/3.15-dev/PyPy3.11-7.3.19, MacOS 15.6 
 
 Inspired by https://www.youtube.com/watch?v=hGyJTcdfR1E

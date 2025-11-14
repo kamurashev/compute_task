@@ -1,35 +1,5 @@
 #!/usr/bin/env bash
 
-# If all dependencies are available and working, just return
-if command -v clang &> /dev/null && command -v hyperfine &> /dev/null; then
-    # Check if clang actually works (can have library issues on Linux)
-    if ! clang --version &> /dev/null; then
-        echo "clang command exists but cannot run (library issue)"
-    else
-        # Check if libomp is available (macOS specific check)
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-            if [ -d "/opt/homebrew/opt/libomp" ] || [ -d "/usr/local/opt/libomp" ]; then
-                return 0 2>/dev/null || exit 0
-            fi
-        else
-            # On Linux, verify clang/llvm versions match (Arch specific issue)
-            if command -v pacman &> /dev/null; then
-                if pacman -Q clang llvm-libs &> /dev/null 2>&1; then
-                    CLANG_VER=$(pacman -Q clang 2>/dev/null | awk '{print $2}' | cut -d'-' -f1)
-                    LLVM_LIBS_VER=$(pacman -Q llvm-libs 2>/dev/null | awk '{print $2}' | cut -d'-' -f1)
-
-                    if [ -n "$CLANG_VER" ] && [ -n "$LLVM_LIBS_VER" ] && [ "$CLANG_VER" = "$LLVM_LIBS_VER" ]; then
-                        return 0 2>/dev/null || exit 0
-                    fi
-                fi
-            else
-                # Non-Arch Linux, assume it's fine if clang runs
-                return 0 2>/dev/null || exit 0
-            fi
-        fi
-    fi
-fi
-
 set -e
 
 echo "Setting up C development environment..."

@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-# If all dependencies are available, just return
-if command -v zig &> /dev/null && command -v hyperfine &> /dev/null; then
-    return 0 2>/dev/null || exit 0
-fi
-
 set -e
 
 echo "Setting up Zig development environment..."
@@ -41,18 +36,41 @@ install_package() {
     esac
 }
 
-# Install Zig if not present
+# Install or update Zig
 if ! command -v zig &> /dev/null; then
+    echo "Zig not found. Installing..."
     install_package "zig"
 else
-    echo "Zig is already installed"
+    echo "Zig is already installed. Updating to latest version..."
+    case $PKG_MGR in
+        brew)
+            brew upgrade zig 2>/dev/null || echo "Zig is already at latest version"
+            ;;
+        apt)
+            sudo apt update && sudo apt install --only-upgrade -y zig 2>/dev/null || echo "Zig is already at latest version"
+            ;;
+        pacman)
+            sudo pacman -S --noconfirm zig
+            ;;
+    esac
 fi
 
-# Install hyperfine if not present
+# Install or update hyperfine
 if ! command -v hyperfine &> /dev/null; then
     install_package "hyperfine"
 else
-    echo "hyperfine is already installed"
+    echo "hyperfine is already installed. Checking for updates..."
+    case $PKG_MGR in
+        brew)
+            brew upgrade hyperfine 2>/dev/null || echo "hyperfine is already at latest version"
+            ;;
+        apt)
+            sudo apt update && sudo apt install --only-upgrade -y hyperfine 2>/dev/null || echo "hyperfine is already at latest version"
+            ;;
+        pacman)
+            sudo pacman -S --noconfirm hyperfine
+            ;;
+    esac
 fi
 
 echo ""

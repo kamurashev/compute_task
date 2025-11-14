@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-# If all dependencies are available, just return
-if command -v v &> /dev/null && command -v hyperfine &> /dev/null; then
-    return 0 2>/dev/null || exit 0
-fi
-
 set -e
 
 echo "Setting up V development environment..."
@@ -41,7 +36,7 @@ install_package() {
     esac
 }
 
-# Install V if not present
+# Install or update V
 if ! command -v v &> /dev/null; then
     echo "V not found. Installing..."
 
@@ -63,34 +58,57 @@ if ! command -v v &> /dev/null; then
             fi
             ;;
         pacman)
-            # Install from AUR or build from source
-            if command -v yay &> /dev/null; then
-                yay -S --noconfirm vlang
-            else
-                # Install dependencies
-                sudo pacman -Sy --noconfirm git make gcc
+            # Install dependencies
+            sudo pacman -Sy --noconfirm git make gcc
 
-                # Clone and build V
-                if [ ! -d "$HOME/.vlang" ]; then
-                    git clone https://github.com/vlang/v "$HOME/.vlang"
-                    cd "$HOME/.vlang"
-                    make
-                    sudo ./v symlink
-                fi
+            # Clone and build V from source
+            if [ ! -d "$HOME/.vlang" ]; then
+                git clone https://github.com/vlang/v "$HOME/.vlang"
+                cd "$HOME/.vlang"
+                make
+                sudo ./v symlink
             fi
             ;;
     esac
 
     echo "V installed successfully"
 else
-    echo "V is already installed"
+    echo "V is already installed. Updating to latest version..."
+
+    case $PKG_MGR in
+        brew)
+            brew upgrade vlang 2>/dev/null || echo "V is already at latest version"
+            ;;
+        apt|pacman)
+            # Update V from source
+            if [ -d "$HOME/.vlang" ]; then
+                cd "$HOME/.vlang"
+                git pull
+                make
+                echo "V updated successfully"
+            else
+                echo "V installation directory not found, cannot update"
+            fi
+            ;;
+    esac
 fi
 
-# Install hyperfine if not present
+# Install or update hyperfine
 if ! command -v hyperfine &> /dev/null; then
     install_package "hyperfine"
 else
-    echo "hyperfine is already installed"
+    echo "hyperfine is already installed. Checking for updates..."
+    case $PKG_MGR in
+        brew)
+            brew upgrade hyperfine 2>/dev/null || echo "hyperfine is already at latest version"
+            ;;
+        apt)
+            sudo apt update && sudo apt install --only-upgrade -y hyperfine 2>/dev/null || echo "hyperfine is already at latest version"
+            ;;
+        pacman)
+            sudo pacman -S --noconfirm hyperfine
+            ;;
+    esac
 fi
 
 echo ""
