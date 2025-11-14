@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
-# Source asdf if available
+# Source asdf if available (only needed for git-based installations)
 if [ -f "$HOME/.asdf/asdf.sh" ]; then
     . "$HOME/.asdf/asdf.sh"
-elif [ -f "/opt/asdf-vm/asdf.sh" ]; then
-    . "/opt/asdf-vm/asdf.sh"
 elif command -v brew &> /dev/null && [ -f "$(brew --prefix asdf)/libexec/asdf.sh" ]; then
     . "$(brew --prefix asdf)/libexec/asdf.sh"
 fi
+# Note: AUR package (asdf-vm) installs to /usr/bin/asdf, no sourcing needed
 
 set -e
 
@@ -105,55 +104,35 @@ if ! command -v asdf &> /dev/null; then
             ;;
 
         pacman)
-            # Install asdf via AUR or git
-            if command -v yay &> /dev/null && yay --version &> /dev/null; then
-                yay -S --noconfirm asdf-vm
-                ASDF_SCRIPT="/opt/asdf-vm/asdf.sh"
-            else
-                # Install dependencies
-                sudo pacman -Sy --noconfirm curl git
+            # Install dependencies
+            sudo pacman -Sy --noconfirm curl git
 
-                # Install asdf via git
-                if [ ! -d "$HOME/.asdf" ]; then
-                    git clone https://github.com/asdf-vm/asdf.git "$HOME/.asdf" --branch v0.14.0
+            # Install asdf via git
+            if [ ! -d "$HOME/.asdf" ]; then
+                git clone https://github.com/asdf-vm/asdf.git "$HOME/.asdf" --branch v0.14.0
+            fi
+
+            # Add to shell configs (both zshrc and bashrc if they exist)
+            for config_file in "$HOME/.zshrc" "$HOME/.bashrc"; do
+                if [ -f "$config_file" ] && ! grep -q "asdf.sh" "$config_file"; then
+                    echo '' >> "$config_file"
+                    echo '. "$HOME/.asdf/asdf.sh"' >> "$config_file"
+                    echo "Added asdf to $config_file"
                 fi
-                ASDF_SCRIPT="$HOME/.asdf/asdf.sh"
-            fi
-
-            # Add to shell config
-            SHELL_CONFIG=""
-            if [ -f "$HOME/.zshrc" ]; then
-                SHELL_CONFIG="$HOME/.zshrc"
-            elif [ -f "$HOME/.bashrc" ]; then
-                SHELL_CONFIG="$HOME/.bashrc"
-            fi
-
-            if [ -n "$SHELL_CONFIG" ] && ! grep -q "asdf.sh" "$SHELL_CONFIG"; then
-                echo '' >> "$SHELL_CONFIG"
-                if [ "$ASDF_SCRIPT" = "/opt/asdf-vm/asdf.sh" ]; then
-                    echo '. /opt/asdf-vm/asdf.sh' >> "$SHELL_CONFIG"
-                else
-                    echo '. "$HOME/.asdf/asdf.sh"' >> "$SHELL_CONFIG"
-                fi
-                echo "Added asdf to $SHELL_CONFIG"
-            fi
+            done
 
             # Source asdf for current session
-            if [ -f "$ASDF_SCRIPT" ]; then
-                . "$ASDF_SCRIPT"
-            fi
+            . "$HOME/.asdf/asdf.sh"
             ;;
     esac
 
     echo "asdf installed successfully"
 else
     echo "asdf is already installed"
-    # Ensure asdf is sourced in current session
+    # Ensure asdf is sourced in current session (only needed for git-based installations)
     if ! command -v asdf &> /dev/null; then
         if [ -f "$HOME/.asdf/asdf.sh" ]; then
             . "$HOME/.asdf/asdf.sh"
-        elif [ -f "/opt/asdf-vm/asdf.sh" ]; then
-            . "/opt/asdf-vm/asdf.sh"
         elif command -v brew &> /dev/null && [ -f "$(brew --prefix asdf)/libexec/asdf.sh" ]; then
             . "$(brew --prefix asdf)/libexec/asdf.sh"
         fi
